@@ -18,8 +18,21 @@ namespace ASP_PV411.Controllers
             return View();
         }
 
+        public IActionResult Intro()
+        {
+            return View();
+        }
+
+        public IActionResult Razor()
+        {
+            return View();
+        }
+
         public IActionResult Privacy()
         {
+            // при пошуку представлення розглядаються два варіанти:
+            // 1. /Views/[controller]/[action] -- /Views/Home/Privacy
+            // 2. /Views/Shared/[action]
             return View();
         }
 
@@ -30,3 +43,14 @@ namespace ASP_PV411.Controllers
         }
     }
 }
+/* Д.З. Створити новий проєкт ASP.NET Core MVC
+ * Додати до нього нові сторінки:
+ * - Intro з описом ASP 
+ * - Razor поки що порожню
+ * - History з основними етапами історії ASP
+ * Включити посилання на ці сторінки до заголовкової частити шаблона, 
+ * зробити скріншоти роботи сторінок.
+ * Опублікувати репозиторій з проєктом, додати до нього директорію 
+ * з скріншотами.
+ * Звіт з ДЗ - посилання на репозиторій
+ */
