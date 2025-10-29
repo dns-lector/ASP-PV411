@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using ASP_PV411.Models;
+using ASP_PV411.Models.Home;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ASP_PV411.Controllers
@@ -25,7 +26,28 @@ namespace ASP_PV411.Controllers
 
         public IActionResult Razor()
         {
-            return View();
+            // ќбм≥нн≥ об'Їкти, що дозвол€ють передати дан≥
+            // в≥д контролера до представленн€
+            // а) у форм≥ dynamic
+            ViewBag.arr1 = new String[] { "string 1", "string 2" };
+            // б) у форм≥ Dictionary
+            ViewData["arr2"] = new String[] { "string 3", "string 4" };
+            // ц≥ об'Їкти пов'€зан≥ м≥ж собою, тобто поклавши дан≥ в один з них,
+            // вилучити можна з ≥ншого, тобто ViewBag.arr2 або  ViewData["arr1"]
+            // (див. у розм≥тц≥)
+
+            // –екомендований вар≥ант - використанн€ моделей
+            HomeRazorViewModel model = new()
+            {
+                Products = [
+                    new() { Name = "Asus",   Price = 18900 },
+                    new() { Name = "Lenovo", Price = 19800 },
+                    new() { Name = "Acer",   Price = 21000 },
+                    new() { Name = "Dell",   Price = 25000 },
+                    new() { Name = "HP",     Price = 15200 },
+                ]
+            };
+            return View(model);   // !! сформована модель передаЇтьс€ до представленн€
         }
 
         public IActionResult Privacy()
