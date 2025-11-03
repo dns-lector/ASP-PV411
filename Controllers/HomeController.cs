@@ -1,7 +1,11 @@
 using System.Diagnostics;
 using ASP_PV411.Models;
 using ASP_PV411.Models.Home;
+using ASP_PV411.Services.Hash;
+using ASP_PV411.Services.Kdf;
 using ASP_PV411.Services.Random;
+using ASP_PV411.Services.Salt;
+using ASP_PV411.Services.Signature;
 using ASP_PV411.Services.Timestamp;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,12 +16,20 @@ namespace ASP_PV411.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly IRandomService _randomService;
         private readonly ITimestampService _timestampService;
+        private readonly IHashService _hashService;
+        private readonly ISaltService _saltService;
+        private readonly IKdfService _kdfService;
+        private readonly ISignatureService _signatureService;
 
-        public HomeController(ILogger<HomeController> logger, IRandomService randomService, ITimestampService timestampService)
+        public HomeController(ILogger<HomeController> logger, IRandomService randomService, ITimestampService timestampService, IHashService hashService, ISaltService saltService, IKdfService kdfService, ISignatureService signatureService)
         {
             _logger = logger;
             _randomService = randomService;
             _timestampService = timestampService;
+            _hashService = hashService;
+            _saltService = saltService;
+            _kdfService = kdfService;
+            _signatureService = signatureService;
         }
 
         public IActionResult Index()
@@ -27,9 +39,13 @@ namespace ASP_PV411.Controllers
 
         public IActionResult IoC()
         {
+            ViewData["sign"] = _signatureService.Sign("123", "456");
             ViewData["rnd"] = _randomService.RandomInt();
             ViewData["ref"] = _randomService.GetHashCode();
             ViewData["ctrl"] = _timestampService.Timestamp();
+            ViewData["hash"] = _hashService.Digest("123");
+            ViewData["salt"] = _saltService.GetSalt() + " " + _saltService.GetSalt(8);
+            ViewData["dk"] = _kdfService.Dk("123", "456");
             return View();
         }
 
@@ -79,14 +95,10 @@ namespace ASP_PV411.Controllers
         }
     }
 }
-/* Д.З. Створити новий проєкт ASP.NET Core MVC
- * Додати до нього нові сторінки:
- * - Intro з описом ASP 
- * - Razor поки що порожню
- * - History з основними етапами історії ASP
- * Включити посилання на ці сторінки до заголовкової частити шаблона, 
- * зробити скріншоти роботи сторінок.
- * Опублікувати репозиторій з проєктом, додати до нього директорію 
- * з скріншотами.
- * Звіт з ДЗ - посилання на репозиторій
+/* Д.З. Додати до проєкту сервіси:
+ * - ОТР (One Time Password) - випадковий рядок з цифрами, кількість цифр
+ *     передавати параметром, передбачити значення за замовчанням
+ * - Генератор випадкових імен файлів заданої довжини (із замовчанням)
+ *     випадковий рядок, що складається з літер одного реєстру, цифр та
+ *     символів, дозволених в іменах файлів: "-", "_", тощо
  */
