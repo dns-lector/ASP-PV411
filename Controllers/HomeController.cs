@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using ASP_PV411.Models;
 using ASP_PV411.Models.Home;
 using ASP_PV411.Services.Hash;
@@ -7,7 +6,11 @@ using ASP_PV411.Services.Random;
 using ASP_PV411.Services.Salt;
 using ASP_PV411.Services.Signature;
 using ASP_PV411.Services.Timestamp;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Diagnostics;
+using System.Text.Json;
 
 namespace ASP_PV411.Controllers
 {
@@ -88,8 +91,58 @@ namespace ASP_PV411.Controllers
              *     --------------------------> Відновлюємо збережені дані      |
              *                                 та формуємо результат          data = 123
              */
-            HttpContext.Session.SetString("data", data);
+            if ( ! String.IsNullOrEmpty(data))
+            {
+                HttpContext.Session.SetString("data", data);
+            }            
             return RedirectToAction(nameof(Forms));
+        }
+
+        public IActionResult FormModels(HomeDemoFormModel? formModel)
+        {
+            if(Request.Method == "POST")
+            {
+                // Зберігаємо дані (модель) у сесії
+                // попередньо серіалізуємо, оскільки сесія не зберігає посилання
+                String json = JsonSerializer.Serialize(formModel);
+                HttpContext.Session.SetString(nameof(HomeDemoFormModel), json);
+                // також зберігаємо результати валідації моделі
+                Dictionary<String, String> dict = [];
+                foreach(var kv in ModelState)
+                {
+                    dict[kv.Key] = String.Join(", ", 
+                        kv.Value.Errors.Select(e => e.ErrorMessage));
+                }
+                json = JsonSerializer.Serialize(dict);
+                HttpContext.Session.SetString(nameof(ModelState),json);
+
+                return RedirectToAction(nameof(FormModels));
+            }
+            else
+            {
+                // готуємо модель представлення
+                HomeDemoViewModel viewModel = new()
+                {
+                    PageTitle = "Форми ІІ. Моделі форм",
+                    FormTitle = "Заповніть наступні дані:"
+                };
+
+                // перевіряємо чи є збережена у сесії модель форми
+                if (HttpContext.Session.Keys.Contains(nameof(HomeDemoFormModel)))
+                {
+                    // якщо є, то десеріалізуємо та переносимо в модель представлення
+                    viewModel.FormModel = JsonSerializer.Deserialize<HomeDemoFormModel>(
+                        HttpContext.Session.GetString(nameof(HomeDemoFormModel))!
+                    );
+                    // також відновлюємо результати валідації моделі
+                    viewModel.ModelErrors = JsonSerializer.Deserialize<Dictionary<String,String>>(
+                        HttpContext.Session.GetString(nameof(ModelState))!
+                    );
+                }
+
+                // передаємо модель на представлення
+                return View(viewModel);
+            }
         }
 
         public IActionResult Intro()
