@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Diagnostics;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace ASP_PV411.Controllers
 {
@@ -106,6 +107,33 @@ namespace ASP_PV411.Controllers
                 // попередньо серіалізуємо, оскільки сесія не зберігає посилання
                 String json = JsonSerializer.Serialize(formModel);
                 HttpContext.Session.SetString(nameof(HomeDemoFormModel), json);
+
+                // Додаткова валідація, що не задається атрибутами
+                if (formModel!.UserBirthdate != null)
+                {
+                    if (DateOnly.FromDateTime(DateTime.Today).DayNumber -
+                        formModel!.UserBirthdate?.DayNumber < 16 * 365)
+                    {
+                        ModelState.AddModelError("user-birthdate",
+                            "Самостійна реєстрація дозволена з 16 років");
+                    }
+                }
+                // Окремо про пароль:
+                if (!String.IsNullOrEmpty(formModel.UserPassword))
+                {
+                    if(!Regex.IsMatch(formModel.UserPassword, @"\d"))
+                    {
+                        ModelState.AddModelError("user-password",
+                            "Пароль повинен містити принаймні одну цифру");
+                    }
+                    if(!Regex.IsMatch(formModel.UserPassword, @"\W"))
+                    {
+                        ModelState.AddModelError("user-password",
+                            "Пароль повинен містити принаймні один спецсимвол");
+                    }
+                }
+                    
+
                 // також зберігаємо результати валідації моделі
                 Dictionary<String, String> dict = [];
                 foreach(var kv in ModelState)

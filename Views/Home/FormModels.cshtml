@@ -1,54 +1,129 @@
 ﻿@model ASP_PV411.Models.Home.HomeDemoViewModel
 
 @{
-    ViewData["Title"] = "Forms";
+	ViewData["Title"] = "Forms";
 }
 
 <div class="text-center">
-    <h1 class="display-4">@Model.PageTitle</h1>
+	<h1 class="display-4">@Model.PageTitle</h1>
 </div>
 
 <p>
-    Моделі форм дозволяють групувати дані для комплексних форм, а також 
-    допомагати з задачами валідації (перевірки даних).
+	Моделі форм дозволяють групувати дані для комплексних форм, а також
+	допомагати з задачами валідації (перевірки даних).
 </p>
 <form class="border m-3 p-3" method="post">
-    <h3>@Model.FormTitle</h3>
+	<h3>@Model.FormTitle</h3>
 
-    <div class="row">
-        <div class="col">
-            <div class="input-group mb-3">
-                <span class="input-group-text" id="username-addon"><i class="bi bi-person-vcard"></i></span>
-                @{
-                    bool isInvalid = !String.IsNullOrEmpty(Model.ModelErrors?["user-name"]);
-                    bool isValid = Model.ModelErrors != null && !isInvalid;
-                }
-                <input type="text" class="form-control  @(isValid ? "is-valid" : "") @(isInvalid ? "is-invalid" : "")"
-                       name="user-name" placeholder="Username"
-                       @* Якщо є передача даних форми, то відновлюємо їх у формі *@
-                       value="@Model.FormModel?.UserName"
-                       aria-label="Username" aria-describedby="username-addon">
+	<div class="row">
+		<div class="col">
+			<div class="input-group mb-3">
+				<span class="input-group-text" id="username-addon"><i class="bi bi-person-vcard"></i></span>
+				@{
+					bool isInvalid = !String.IsNullOrEmpty(Model.ModelErrors?["user-name"]);
+					bool isValid = Model.ModelErrors != null && !isInvalid;
+				}
+				<input type="text" class="form-control  @(isValid ? "is-valid" : "") @(isInvalid ? "is-invalid" : "")"
+					   name="user-name" placeholder="Username"
+					   @* Якщо є передача даних форми, то відновлюємо їх у формі *@
+					   value="@Model.FormModel?.UserName"
+					   aria-label="Username" aria-describedby="username-addon">
 
-                @if (isInvalid)
-                {
-                    <div class="invalid-feedback">
-                        @(Model.ModelErrors!["user-name"])
-                    </div>
-                }
-            </div>
-        </div>
-        <div class="col">
-            <div class="input-group mb-3">
-                <span class="input-group-text" id="user-email-addon"><i class="bi bi-envelope-at"></i></span>
-                @* Д.З. Реалізувати стилізацію валідації поля форми "user-email". 
+				@if (isInvalid)
+				{
+					<div class="invalid-feedback">
+						@(Model.ModelErrors!["user-name"])
+					</div>
+				}
+			</div>
+		</div>
+		<div class="col">
+			<div class="input-group mb-3">
+				<span class="input-group-text" id="user-email-addon"><i class="bi bi-envelope-at"></i></span>
+				@* Д.З. Реалізувати стилізацію валідації поля форми "user-email". 
                     До звіту додати два скріншоти або відеозапис робочого столу *@
-                <input type="email" class="form-control"
-                       name="user-email" placeholder="E-mail"
-                       value="@Model.FormModel?.UserEmail"
-                       aria-label="E-mail" aria-describedby="user-email-addon">
-            </div>
-        </div>
-    </div>
+				<input type="email" class="form-control"
+					   name="user-email" placeholder="E-mail"
+					   value="@Model.FormModel?.UserEmail"
+					   aria-label="E-mail" aria-describedby="user-email-addon">
+			</div>
+		</div>
+	</div>
 
-    <button class="btn btn-primary" type="submit">Передати дані</button>
+	<div class="row">
+		<div class="col">
+			@{
+				isInvalid = !String.IsNullOrEmpty(Model.ModelErrors?["user-password"]);
+			}
+			<div class="input-group mb-3">
+				<span class="input-group-text" id="user-password-addon"><i class="bi bi-key"></i></span>
+				<input type="password" class="form-control @(isInvalid ? "is-invalid" : "")"
+					   name="user-password" placeholder="Password"
+					   @* value - для паролів не прийнято відтворювати значення *@
+					   aria-label="Password" aria-describedby="user-password-addon">
+				@if (isInvalid)
+				{
+					<div class="invalid-feedback">
+						@(Model.ModelErrors!["user-password"])
+					</div>
+				}
+			</div>
+		</div>
+		<div class="col">
+			<div class="input-group mb-3">
+				@{
+					isInvalid = !String.IsNullOrEmpty(Model.ModelErrors?["user-birthdate"]);
+					isValid = Model.ModelErrors != null && !isInvalid;
+				}
+				<span class="input-group-text" id="user-birthdate-addon"><i class="bi bi-cake"></i></span>
+				<input type="date" class="form-control @(isValid ? "is-valid" : "") @(isInvalid ? "is-invalid" : "")"
+					   name="user-birthdate" title="Дата народження"
+					   value="@Model.FormModel?.UserBirthdate?.ToString("yyyy-MM-dd")"
+					   aria-label="Дата народження" aria-describedby="user-birthdate-addon">
+			
+				@if (isInvalid)
+				{
+					<div class="invalid-feedback">
+						@(Model.ModelErrors!["user-birthdate"])
+					</div>
+				}
+			</div>
+		</div>
+
+
+
+	</div>
+
+	<div class="row">
+		<div class="form-check">
+			<div class="mb-3 ms-1">
+				@{
+					isInvalid = !String.IsNullOrEmpty(Model.ModelErrors?["agreement"]);
+					isValid = Model.ModelErrors != null && !isInvalid;
+				}
+				<input class="form-check-input @(isValid ? "is-valid" : "") @(isInvalid ? "is-invalid" : "")"
+					type="checkbox" 
+					name="agreement"
+					value="@Model.FormModel?.IsAgree" id="checkDefault">
+				<label class="form-check-label" for="checkDefault">
+					Погоджуюсь з <a asp-action="Privacy">правилами сайту</a>
+				</label>
+				@if (isInvalid)
+				{
+					<div class="invalid-feedback">
+						@(Model.ModelErrors!["agreement"])
+					</div>
+				}
+			</div>
+		</div>
+	</div>
+
+	<button class="btn btn-primary mt-3" type="submit">Передати дані</button>
 </form>
+@*
+	Д.З. Додати до форми реєстрації поле для введення телефону користувача
+	Забезпечити валідацію 
+	- поле необхідне
+	- телефон починається +380
+	- телефон має 9 цифр після префіксу +380
+*@
