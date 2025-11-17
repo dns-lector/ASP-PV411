@@ -1,9 +1,11 @@
+using ASP_PV411.Data;
 using ASP_PV411.Services.Hash;
 using ASP_PV411.Services.Kdf;
 using ASP_PV411.Services.Random;
 using ASP_PV411.Services.Salt;
 using ASP_PV411.Services.Signature;
 using ASP_PV411.Services.Timestamp;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +38,12 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+// Підключення контексту даних
+String connectionString = builder.Configuration.GetConnectionString("LocalDb")
+    ?? throw new KeyNotFoundException("Connection String Configuration: key not found 'LocalDb'");
+// Для EF-контекстів є свій метод реєстрації - AddDbContext
+builder.Services.AddDbContext<DataContext>(
+    options => options.UseSqlServer(connectionString));
 
 
 var app = builder.Build();

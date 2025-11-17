@@ -46,6 +46,11 @@ namespace ASP_PV411.Controllers
             return View();
         }
 
+        public IActionResult Db()
+        {
+            return View();
+        }
+
         public IActionResult IoC()
         {
             ViewData["sign"] = _signatureService.Sign("123", "456");
