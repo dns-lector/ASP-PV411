@@ -1,4 +1,5 @@
 using ASP_PV411.Data;
+using ASP_PV411.Middleware;
 using ASP_PV411.Services.Hash;
 using ASP_PV411.Services.Kdf;
 using ASP_PV411.Services.Random;
@@ -33,7 +34,7 @@ builder.Services.AddDistributedMemoryCache();
 
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromSeconds(10);
+    options.IdleTimeout = TimeSpan.FromMinutes(15);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
@@ -55,15 +56,15 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
 app.UseHttpsRedirection();
 app.UseRouting();
-
 app.UseAuthorization();
-
 app.UseSession();
-
 app.MapStaticAssets();
+
+
+app.UseAuthSession();   // додатковий Middleware.
+
 
 app.MapControllerRoute(
     name: "default",

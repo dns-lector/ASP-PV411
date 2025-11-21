@@ -1,4 +1,14 @@
-﻿<!DOCTYPE html>
+﻿@using ASP_PV411.Middleware
+@{
+    bool isAuthenticated = Context.Items.ContainsKey(AuthSessionMiddleware.SessionKey);
+    String? userName = isAuthenticated ?
+        ((ASP_PV411.Data.Entities.User)
+            Context.Items[AuthSessionMiddleware.SessionKey]!).Name
+        : null;
+    String? userLetter = isAuthenticated ? userName![0].ToString() : null;
+    String? userTitle = isAuthenticated ? userName : null;
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -39,13 +49,27 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Db" title="База даних. Контекст"><i class="bi bi-database"></i></a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Middleware" title="Middleware. Утримання авторизації"><i class="bi bi-arrow-bar-right"></i></a>
+                        </li>
                     </ul>
-                
-                    <!-- Button trigger modal -->
-                    <button type="button" class="btn btn-outline-secondary" 
-                            data-bs-toggle="modal" data-bs-target="#authModal">
-                        <i class="bi bi-box-arrow-in-right"></i>
-                    </button>
+                        @if (isAuthenticated)
+                        {
+						<div title="@userTitle">@userLetter</div>
+                        <a href="?logout" class="btn btn-outline-secondary"
+                            title="Вихід з авторизованого режиму">
+                            <i class="bi bi-box-arrow-left"></i>
+                        </a>
+                        }
+                        else
+                        {
+						<!-- Button trigger modal -->
+						<button type="button" class="btn btn-outline-secondary"
+								data-bs-toggle="modal" data-bs-target="#authModal">
+							<i class="bi bi-box-arrow-in-right"></i>
+						</button>
+                        }
+                        
                 </div>
             </div>
         </nav>
@@ -87,8 +111,11 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Скасувати</button>
-                    <button type="submit" class="btn btn-primary" form="auth-form">Вхід</button>
+                    <div id="auth-error" class="alert alert-danger py-2" role="alert">
+                        A simple danger alert—check it out!
+                    </div>
+                    <button type="button" class="btn btn-secondary py-2" data-bs-dismiss="modal">Скасувати</button>
+                    <button type="submit" class="btn btn-primary py-2" form="auth-form">Вхід</button>
                 </div>
             </div>
         </div>
