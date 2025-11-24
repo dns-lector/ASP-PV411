@@ -48,6 +48,17 @@ document.addEventListener('submit', e => {
     }
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+    let btn = document.getElementById("btn-profile-edit");
+    if (btn) btn.addEventListener('click', btnProfileEditClick);
+});
+
+function btnProfileEditClick() {
+    for (let item of document.querySelectorAll("[data-profile-editable]")) {
+        item.setAttribute("contenteditable", true);
+    }
+}
+
 /*
 Base64
 "ABC" ->

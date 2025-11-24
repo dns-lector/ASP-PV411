@@ -1,7 +1,10 @@
 ﻿using ASP_PV411.Data;
 using ASP_PV411.Middleware;
+using ASP_PV411.Models.User;
 using ASP_PV411.Services.Kdf;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 
@@ -14,6 +17,29 @@ namespace ASP_PV411.Controllers
         public IActionResult Index()
         {
             return View();
+        }
+
+        public IActionResult Profile()
+        {
+            bool isAuthenticated = HttpContext.User.Identity?.IsAuthenticated ?? false;
+            if (isAuthenticated)
+            {
+                String userId = HttpContext.User.Claims.First(c => c.Type == ClaimTypes.Sid).Value;
+                var user = dataContext
+                    .Users
+                    .Include(u => u.Role)
+                    .First(u => u.Id == Guid.Parse(userId))!;
+
+                return View(new UserProfileViewModel
+                {
+                    User = user,
+                    IsPersonal = true,
+                });
+            }
+            else
+            {
+                return RedirectToAction("Index", "Home");
+            }
         }
 
         public IActionResult Authenticate()
@@ -96,9 +122,10 @@ namespace ASP_PV411.Controllers
         }
     }
 }
-/* Д.З. Реалізувати виведення повідомлень про помилки автентифікації
- * у складі модального вікна ліворуч від його кнопок.
- * Рекомендується використати компонент типу alert від bootstrap
- * https://getbootstrap.com/docs/5.3/components/alerts/
- * (виводити тільки за наявності помилок, без них - прихований)
+/* Д.З. Реалізувати сторінку User/Private, яка буде
+ * доступна тільки у разі, якщо користувач автентифікований.
+ * Забезпечити різні рівні захисту доступу:
+ * - приховування посилання для неавтентифікованих користувачів
+ * - блокувати контент при спробі прямого доступу неавтентифікованих користувачів
+ * - переадресація на домашню сторінку при спробі переходу неавтентифікованих користувачів
  */
