@@ -15,7 +15,49 @@
 }
 
 document.addEventListener('submit', e => {
-    const form = e.target;// as HTMLFormElement;
+    const form = e.target;
+    if (form && form["id"] == "signup-form" && form instanceof HTMLFormElement) {
+        e.preventDefault();              // Перехоплення надсилання форми та 
+        fetch("/User/Register", {        // переведення його до асинхронної
+            method: "POST",              // форми (AJAX)
+            body: new FormData(form)     // 
+        }).then(r => {                   // 
+            return r.json();
+        }).then(j => {
+            if (j.status == "Ok") {
+                alert("Вітаємо з успішною реєстрацією!");
+            }
+            else {
+
+                for (let elem of form.querySelectorAll("input")) {
+                    elem.classList.remove("is-invalid");
+                }
+
+                for (let name in j['errors']) {
+                    let input = form.querySelector(`[name="${name}"]`);
+                    if (input) {
+                        input.classList.add("is-invalid");
+                        let fb = form.querySelector(`[name="${name}"]+.invalid-feedback`);
+                        if (fb) {
+                            fb.innerText = j['errors'][name];
+                        }
+                    }
+                    else {
+                        console.error(`Input name = '${name}' not found`);
+                    }
+                }
+            }
+        });
+        /*
+        Д.З. Завершити виведення повідомлень валідації полів форми 
+        реєстрації нового користувача.
+        За аналогією FormModels додати валідацію паролю на вміст
+        різного контенту, а також валідацію е-пошти за стандартним шаблоном
+        * Реалізувати виділення полів, що пройшли валідацію, "зеленим" стилем
+        * Додати валідацію телефона
+        */
+    }
+
     if(form && form["id"] == "auth-form" && form instanceof HTMLFormElement) {
         e.preventDefault();
         const formData = new FormData(form);
@@ -51,7 +93,26 @@ document.addEventListener('submit', e => {
 document.addEventListener('DOMContentLoaded', () => {
     let btn = document.getElementById("btn-profile-edit");
     if (btn) btn.addEventListener('click', btnProfileEditClick);
+
+    btn = document.getElementById("btn-profile-delete");
+    if (btn) btn.addEventListener('click', btnProfileDeleteClick);
 });
+
+function btnProfileDeleteClick() {
+    if (confirm("Ви збираєтесь закрити профіль. Уся персональна інформація буде видалена і не підлягатиме відновленню. Підтверджуєте?")) {
+        fetch("/User/Erase", {
+            method: "DELETE"
+        }).then(r => {
+            if (r.ok) {
+                alert("Ваш профіль видалено.");
+                window.location = "/";
+            }
+            else {
+                alert("Виникла помилка, повторіть спробу пізніше");
+            }
+        });
+    }
+}
 
 function btnProfileEditClick(e) {
     const btn = e.target.closest("button");

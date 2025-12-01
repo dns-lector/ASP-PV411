@@ -4,8 +4,10 @@ using ASP_PV411.Middleware;
 using ASP_PV411.Models.User;
 using ASP_PV411.Services.Kdf;
 using ASP_PV411.Services.Salt;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
@@ -21,6 +23,61 @@ namespace ASP_PV411.Controllers
         public IActionResult Index()
         {
             return View();
+        }
+
+        public ViewResult SignUp()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public JsonResult Register(UserRegisterFormModel formModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                Dictionary<String, String> errors = [];
+                foreach (var kv in ModelState)
+                {
+                    String errMessages = String.Join(", ",
+                        kv.Value.Errors.Select(e => e.ErrorMessage));
+
+                    if(!String.IsNullOrEmpty(errMessages))
+                    {
+                        errors[kv.Key] = errMessages;
+                    }                    
+                }
+                return Json(new { 
+                    Status = "Error",
+                    Errors = errors
+                });
+            }
+            if (dataContext.Users.Any(u => u.Login == formModel.UserLogin))
+            {
+
+                return Json(new
+                {
+                    Status = "Error",
+                    Errors = new Dictionary<String, String>() {
+                        { "user-login", "Login in use" }
+                    }
+                });
+            }
+            String salt = saltService.GetSalt();
+            dataContext.Users.Add(new()
+            {
+                Id = Guid.NewGuid(),
+                Name = formModel.UserName,
+                Email = formModel.UserEmail,
+                Phone = formModel.UserPhone,
+                Login = formModel.UserLogin,
+                Salt = salt,
+                Dk = kdfService.Dk(formModel.UserPassword, salt),
+                Birthdate = formModel.UserBirthdate,
+                RegisterAt = DateTime.Now,
+                RoleId = "User"
+            });
+            dataContext.SaveChanges();
+            return Json(new { Status = "Ok" });
         }
 
         [HttpPatch]
@@ -96,7 +153,7 @@ namespace ASP_PV411.Controllers
                 var user = dataContext
                     .Users
                     .Include(u => u.Role)
-                    .First(u => u.Id == Guid.Parse(userId))!;
+                    .First(u => u.Id == Guid.Parse(userId) && u.DeleteAt == null)!;
 
                 return View(new UserProfileViewModel
                 {
@@ -107,6 +164,54 @@ namespace ASP_PV411.Controllers
             else
             {
                 return RedirectToAction("Index", "Home");
+            }
+        }
+
+        [HttpDelete]
+        public async Task<JsonResult> EraseAsync()
+        {
+            bool isAuthenticated = HttpContext.User.Identity?.IsAuthenticated ?? false;
+            if (isAuthenticated)
+            {
+                String userId = HttpContext.User.Claims.First(c => c.Type == ClaimTypes.Sid).Value;
+                var user = dataContext
+                    .Users
+                    .First(u => u.Id == Guid.Parse(userId))!;
+                // dataContext.Remove(user); -- не рекомендується
+                // foreach(var prop in user.GetType().GetProperties())
+                // {
+                //     if(prop.GetCustomAttribute<PersonalDataAttribute>() != null)
+                //     {
+                //         if (prop.GetType().IsAbstract)
+                //         {
+                // 
+                //         }
+                //     }
+                // }
+                user.Name = user.Email = user.Phone = "";
+                user.Birthdate = null;
+                user.DeleteAt = DateTime.Now;
+
+                // запускаємо задачу збереження асинхронно
+                var saveTask = dataContext.SaveChangesAsync();
+
+                // Видаляємо збережені дані у сесії 
+                AuthSessionMiddleware.Logout(HttpContext);
+
+                // очікуємо завершення задачі збереження
+                await saveTask;
+
+                return Json(new { Status = "Ok" });
+            }
+            else
+            {
+                Response.StatusCode = StatusCodes.Status401Unauthorized;
+                return Json(new { 
+                    Status = "Error",
+                    Errors = new Dictionary<String, String>() {
+                        { "auth", "User not authorized" }
+                    }
+                });
             }
         }
 
@@ -165,7 +270,10 @@ namespace ASP_PV411.Controllers
             String password = parts[1];     // open sesame
 
             // Шукаємо у БД користувача за логіном
-            var user = dataContext.Users.FirstOrDefault(u => u.Login == login);
+            var user = dataContext
+                .Users
+                .FirstOrDefault(u => u.Login == login && u.DeleteAt == null);
+
             if (user == null)
             {
                 Response.StatusCode = StatusCodes.Status401Unauthorized;

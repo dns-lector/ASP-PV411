@@ -1,0 +1,11 @@
+﻿namespace ASP_PV411.Data.Entities
+{
+    public class Group
+    {
+        public Guid Id { get; set; }
+        public String Name { get; set;} = null!;
+        public String Description { get; set;} = null!;
+        public String ImageUrl { get; set; } = null!;
+        public DateTime? DeleteAt { get; set; }
+    }
+}

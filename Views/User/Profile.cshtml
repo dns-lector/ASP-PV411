@@ -62,20 +62,54 @@ else
 						<td>Роль (права)</td>
 						<td>
 							@Model.User.RoleId (
-							@if (Model.User.Role.CanRead < 0)
+							@if (Model.User.Role.CanCreate > 0)
 							{
-								<b>Перегляд</b>
+								<b>C</b>
 							}
 							else
 							{
-								<s>Перегляд</s>
+								<s>C</s>
+							}
+							@if (Model.User.Role.CanRead > 0)
+							{
+								<b>R</b>
+							}
+							else
+							{
+								<s>R</s>
+							}
+							@if (Model.User.Role.CanUpdate > 0)
+							{
+								<b>U</b>
+							}
+							else
+							{
+								<s>U</s>
+							}
+							@if (Model.User.Role.CanDelete > 0)
+							{
+								<b>D</b>
+							}
+							else
+							{
+								<s>D</s>
 							}
 							)
 						</td>
 					</tr>
 				</tbody>
 			</table>
+			<button id="btn-profile-delete" class="btn btn-danger">
+				Видалити профіль
+			</button>
 		</div>
 	</div>
 	
 }
+@*
+	Д.З. Розширити "персональний кабінет" користувача
+	на відображення номеру телефону з можливістю його
+	редагування. Забезпечити обробку і валідацію
+	телефону у методі Update, провести тестування.
+	До звіту з ДЗ додати скріншоти
+*@

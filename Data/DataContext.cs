@@ -17,6 +17,10 @@ namespace ASP_PV411.Data
         public DbSet<Entities.User> Users { get; set; }
         public DbSet<Entities.UserRole> UserRoles { get; set; }
         public DbSet<Entities.Token> Tokens { get; set; }
+        public DbSet<Entities.Group> Groups { get; set; }
+        public DbSet<Entities.Manufacturer> Manufacturers { get; set; }
+        public DbSet<Entities.Product> Products { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -75,3 +79,25 @@ namespace ASP_PV411.Data
         }
     }
 }
+/*
+Shop:
+
+[Group]             [Product]            [Manufacturer]
+ Id-----------\      Id                /---Id         
+ Name          \-----GroupId          /    Name       
+ Description         ManufacturerId--/     Description
+ ImageUrl            Name                  ImageUrl   
+ DeleteAt            Description           DeleteAt
+                     Price               
+                     Stock          
+                     ImageUrl
+                     DeleteAt   
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ */
