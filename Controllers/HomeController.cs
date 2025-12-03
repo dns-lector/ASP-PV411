@@ -5,6 +5,7 @@ using ASP_PV411.Services.Kdf;
 using ASP_PV411.Services.Random;
 using ASP_PV411.Services.Salt;
 using ASP_PV411.Services.Signature;
+using ASP_PV411.Services.Storage;
 using ASP_PV411.Services.Timestamp;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -24,8 +25,9 @@ namespace ASP_PV411.Controllers
         private readonly ISaltService _saltService;
         private readonly IKdfService _kdfService;
         private readonly ISignatureService _signatureService;
+        private readonly IStorageService _storageService;
 
-        public HomeController(ILogger<HomeController> logger, IRandomService randomService, ITimestampService timestampService, IHashService hashService, ISaltService saltService, IKdfService kdfService, ISignatureService signatureService)
+        public HomeController(ILogger<HomeController> logger, IRandomService randomService, ITimestampService timestampService, IHashService hashService, ISaltService saltService, IKdfService kdfService, ISignatureService signatureService, IStorageService storageService)
         {
             _logger = logger;
             _randomService = randomService;
@@ -34,6 +36,7 @@ namespace ASP_PV411.Controllers
             _saltService = saltService;
             _kdfService = kdfService;
             _signatureService = signatureService;
+            _storageService = storageService;
         }
 
         public IActionResult Index()
@@ -43,6 +46,25 @@ namespace ASP_PV411.Controllers
 
         public IActionResult Controllers()
         {
+            return View();
+        }
+
+        public IActionResult Storage(HomeStorageFormModel? formModel)
+        {
+            if (Request.Method == "POST")
+            {
+                try
+                {
+                    String name = _storageService.Save(formModel.FormFile);
+                    ViewData["result"] = $"File saved: {name}";
+                    _logger.LogInformation("File saved: {name}", name);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.Message);
+                    ViewData["result"] = ex.Message;
+                }
+            }
             return View();
         }
 

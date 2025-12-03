@@ -5,6 +5,7 @@ using ASP_PV411.Services.Kdf;
 using ASP_PV411.Services.Random;
 using ASP_PV411.Services.Salt;
 using ASP_PV411.Services.Signature;
+using ASP_PV411.Services.Storage;
 using ASP_PV411.Services.Timestamp;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,6 +29,7 @@ builder.Services.AddHash();
 builder.Services.AddSalt();
 builder.Services.AddKdf();
 builder.Services.AddSignature();
+builder.Services.AddStorage();
 
 // сесії - як інструмент збереження даних між запитами
 builder.Services.AddDistributedMemoryCache();

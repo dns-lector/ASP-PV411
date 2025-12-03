@@ -12,6 +12,9 @@
 		 : null;
 	String? userLetter = isAuthenticated ? userName![0].ToString() : null;
 	String? userTitle = isAuthenticated ? userName : null;
+    String? roleId = isAuthenticated
+        ? Context.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value
+        : null;
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -57,10 +60,24 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Middleware" title="Middleware. Утримання авторизації"><i class="bi bi-arrow-bar-right"></i></a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Storage" title="Завантаження та збереження файлів">
+                                <i class="bi bi-file-earmark-arrow-up"></i>
+                            </a>
+                        </li>
                     </ul>
                         @if (isAuthenticated)
                         {
-						<a asp-controller="User" asp-action="Profile" 
+                            if(roleId == "Admin")
+                            {
+                            <a asp-controller="Admin" 
+                               asp-action="Index"
+                               class="nav-link p-2" 
+                               title="Панель адміністратора">
+                                    <i class="bi bi-speedometer2"></i>
+                            </a>
+                            }
+                        <a asp-controller="User" asp-action="Profile" 
                            class="nav-link p-2" title="@userTitle">@userLetter</a>
 
                         <a href="?logout" class="btn btn-outline-secondary"

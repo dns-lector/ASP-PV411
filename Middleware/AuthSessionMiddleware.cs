@@ -53,6 +53,8 @@ namespace ASP_PV411.Middleware
                                 user.Login),                         // за яким можна дізнатись 
                             new Claim(ClaimTypes.Sid,                // походження Claims
                                 user.Id.ToString()),                 // 
+                            new Claim(ClaimTypes.Role,
+                                user.RoleId),
                         ],                                           // Технічно, користувач може мати
                         nameof(AuthSessionMiddleware)                // декілька Identity різного походження
                     )
