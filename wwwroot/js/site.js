@@ -88,7 +88,82 @@ document.addEventListener('submit', e => {
             }
         });
     }
+
+    if (form && form["id"] == "admin-group-form" && form instanceof HTMLFormElement) {
+        e.preventDefault();
+        adminGroupFormSubmitted(form);
+    }
+
+    if (form && form["id"] == "admin-manufacturer-form" && form instanceof HTMLFormElement) {
+        e.preventDefault();
+        adminManufacturerFormSubmitted(form);
+    }
+
+    if (form && form["id"] == "admin-product-form" && form instanceof HTMLFormElement) {
+        e.preventDefault();
+        adminProductFormSubmitted(form);
+    }
 });
+
+function adminProductFormSubmitted(form) {
+    fetch("/Admin/AddProduct", {
+        method: "POST",
+        body: new FormData(form)
+    }).then(r => {
+        return r.json();
+    }).then(j => {
+        console.log(j);
+        if (j.status == 'Ok') {
+            alert("Додано успішно");
+            form.reset();
+        }
+        else {
+            // Д.З. Реалізувати виведення результатів помилок валідації
+            // для всіх форм панелі адміністратора
+            // *Реалізувати поєднання усіх помилок додаткової валідації 
+            //  з боку контролера.
+            alert(JSON.stringify(j.errors, null, 2));
+        }
+    });
+}
+
+function adminManufacturerFormSubmitted(form) {
+    fetch("/Admin/AddManufacturer", {
+        method: "POST",
+        body: new FormData(form)
+    }).then(r => {
+        return r.json();
+    }).then(j => {
+        console.log(j);
+        if (j.status == 'Ok') {
+            alert("Додано успішно");
+            form.reset();
+        }
+        else {
+            // Д.З. Реалізувати виведення результатів помилок валідації
+            alert(JSON.stringify(j.errors, null, 2));
+        }
+    });
+}
+
+function adminGroupFormSubmitted(form) {
+    fetch("/Admin/AddGroup", {
+        method: "POST",
+        body: new FormData(form)
+    }).then(r => {
+        return r.json();
+    }).then(j => {
+        console.log(j);
+        if (j.status == 'Ok') {
+            alert("Додано успішно");
+            form.reset();
+        }
+        else {
+            // Д.З. Реалізувати виведення результатів помилок валідації
+            alert(JSON.stringify(j.errors, null, 2));
+        }
+    });
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     let btn = document.getElementById("btn-profile-edit");
