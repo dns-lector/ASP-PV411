@@ -24,6 +24,9 @@ namespace ASP_PV411.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Entities.Product>()
+                .HasOne(p => p.Group)
+                .WithMany(g => g.Products);
 
             modelBuilder.Entity<Entities.User>()
                 .HasIndex(u => u.Login)

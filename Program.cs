@@ -51,6 +51,14 @@ builder.Services.AddDbContext<DataContext>(
 
 var app = builder.Build();
 
+var migrationTask = app
+    .Services
+    .CreateScope()
+    .ServiceProvider
+    .GetRequiredService<DataContext>()
+    .Database
+    .MigrateAsync();  // Apply migrations
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -64,9 +72,7 @@ app.UseAuthorization();
 app.UseSession();
 app.MapStaticAssets();
 
-
 app.UseAuthSession();   // додатковий Middleware.
-
 
 app.MapControllerRoute(
     name: "default",
@@ -85,4 +91,5 @@ app.MapControllerRoute(
  * - передається виконання на нього
  */
 
+await migrationTask;
 app.Run();

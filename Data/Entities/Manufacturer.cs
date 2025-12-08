@@ -6,6 +6,7 @@
         public String Name { get; set; } = null!;
         public String Description { get; set; } = null!;
         public String ImageUrl { get; set; } = null!;
+        public String Slug { get; set; } = "";
         public DateTime? DeleteAt { get; set; }
     }
 }

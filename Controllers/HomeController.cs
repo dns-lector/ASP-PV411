@@ -49,6 +49,29 @@ namespace ASP_PV411.Controllers
             return View();
         }
 
+        public IActionResult Templates()
+        {
+            return View(new HomeTemplatesViewModel
+            {
+                UserRole = new()
+                {
+                    Id = "Test",
+                    Description = "Test User Role",
+                    CanCreate = 1,
+                    CanDelete = 0,
+                    CanRead = 1,
+                    CanUpdate = 0,
+                },
+                Token = new()
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = Guid.NewGuid(),
+                    IssuedAt = DateTime.Now,
+                    ExpiredAt = DateTime.Now.AddHours(1.3),
+                }
+            });
+        }
+
         public IActionResult Storage(HomeStorageFormModel? formModel)
         {
             if (Request.Method == "POST")
