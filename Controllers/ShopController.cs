@@ -27,5 +27,16 @@ namespace ASP_PV411.Controllers
             };
             return View(model);
         }
+
+        public IActionResult Product([FromRoute]String id)
+        {
+            ShopProductViewModel model = new()
+            {
+                Product = dataContext
+                .Products
+                .FirstOrDefault(p => p.Slug == id || p.Id.ToString() == id),
+            };
+            return View(model);
+        }
     }
 }

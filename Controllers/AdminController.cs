@@ -133,6 +133,81 @@ namespace ASP_PV411.Controllers
 
         public JsonResult AddProduct(AdminProductFormModel formModel)
         {
+            
+            String key = "admin-product-group";
+            Guid groupId = default;
+            try { groupId = Guid.Parse(formModel.GroupId); }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(key, ex.Message);
+            }
+            key = "admin-product-manufacturer";
+            Guid manufacturerId = default;
+            try { manufacturerId = Guid.Parse(formModel.ManufacturerId); }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(key, ex.Message);
+            }
+            Dictionary<String, String> errors = [];
+            foreach (var kv in ModelState)
+            {
+                String errMessages = String.Join(", ",
+                    kv.Value.Errors.Select(e => e.ErrorMessage));
+
+                if (!String.IsNullOrEmpty(errMessages))
+                {
+                    errors[kv.Key] = errMessages;
+                }
+            }
+
+            
+            if (errors.Count > 0)
+            {
+                return Json(new
+                {
+                    Status = "Error",
+                    Errors = errors
+                });
+            }
+
+            String? savedName = null;
+            if(formModel.Image != null && formModel.Image.Length > 0)
+            {
+                try { savedName = storageService.Save(formModel.Image); }
+                catch (Exception ex)
+                {
+                    return Json(new
+                    {
+                        Status = "Error",
+                        Errors = new Dictionary<String, String> {
+                            { "admin-product-image", ex.Message }
+                        }
+                    });
+                }
+            }
+
+            Data.Entities.Product item = new()
+            {
+                Id = Guid.NewGuid(),
+                GroupId = groupId,
+                ManufacturerId = manufacturerId,
+                Name = formModel.Name,
+                Description = formModel.Description,
+                ImageUrl = savedName,
+                Price = formModel.Price,
+                Stock = formModel.Stock,
+            };
+            dataContext.Products.Add(item);
+            dataContext.SaveChanges();
+            return Json(new
+            {
+                status = "Ok",
+                data = item
+            });
+        }
+
+        public JsonResult AddProductOld(AdminProductFormModel formModel)
+        {
             if (ModelState.IsValid)
             {
                 String? savedName = null;
