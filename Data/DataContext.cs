@@ -20,10 +20,29 @@ namespace ASP_PV411.Data
         public DbSet<Entities.Group> Groups { get; set; }
         public DbSet<Entities.Manufacturer> Manufacturers { get; set; }
         public DbSet<Entities.Product> Products { get; set; }
+        public DbSet<Entities.Cart> Carts { get; set; }
+        public DbSet<Entities.CartItem> CartItems { get; set; }
+        public DbSet<Entities.Discount> Discounts { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Entities.Cart>()
+                .HasOne(x => x.User)
+                .WithMany(x => x.Carts);
+
+            modelBuilder.Entity<Entities.Cart>()
+                .HasOne(x => x.Discount)
+                .WithMany();
+
+            modelBuilder.Entity<Entities.CartItem>()
+                .HasOne(x => x.Discount)
+                .WithMany();
+
+            modelBuilder.Entity<Entities.CartItem>()
+                .HasOne(x => x.Cart)
+                .WithMany(x => x.CartItems);
+
             modelBuilder.Entity<Entities.Product>()
                 .HasOne(p => p.Group)
                 .WithMany(g => g.Products);
@@ -96,11 +115,25 @@ Shop:
                      ImageUrl
                      DeleteAt   
  
+Cart: кошик споживача 
  
- 
- 
- 
- 
- 
+ [Cart]        [CartItem]
+  Id -----\     Id
+--UserId   \--- CartId
+  Price         ProductId --...
+  OpenAt        OpenAt 
+  CloseAt       DeleteAt
+  CloseStatus
+  DiscountId    Quantity
+   |            Price
+   |            DiscountId
+   |         /
+ [Discounts]
+  Id
+  Description
+  StartAt
+  FinishAt
+  ...
+
  
  */
