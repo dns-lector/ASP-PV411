@@ -33,3 +33,23 @@ body {
 [contenteditable] {
     background-color: #ffe !important;
 }
+
+.w-15 {
+    width: 15%;
+}
+
+.wh-1 {
+    width: 1em;
+    height: 1em;
+}
+
+.wh-2 {
+    width: 2em;
+    height: 2em;
+}
+
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
