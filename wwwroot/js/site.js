@@ -175,7 +175,43 @@ document.addEventListener('DOMContentLoaded', () => {
     for (let b of document.querySelectorAll("[data-to-cart]")) {
         b.addEventListener('click', btnAddToCartClick);
     }
+    for (let b of document.querySelectorAll("[data-buy-cart]")) {
+        b.addEventListener('click', btnBuyCartClick);
+    }
+    for (let b of document.querySelectorAll("[data-drop-cart]")) {
+        b.addEventListener('click', btnDropCartClick);
+    }
 });
+
+function btnDropCartClick(e) {
+    let btn = e.target.closest("[data-drop-cart]");
+    if (!btn) throw "btnDropCartClick: closest not found";
+    let id = btn.getAttribute("data-drop-cart");
+    fetch("/Cart/Drop/" + id).then(r => r.json()).then(j => {
+        if (j.status == "Ok") {
+            window.location.reload();
+        }
+        else {
+            alert(j.message);
+        }
+    });
+}
+
+function btnBuyCartClick(e) {
+    let btn = e.target.closest("[data-buy-cart]");
+    if (!btn) throw "btnBuyCartClick: closest not found";
+    let id = btn.getAttribute("data-buy-cart");
+    fetch("/Cart/Buy/" + id).then(r => r.json()).then(j => {
+        if (j.status == "Ok") {
+
+            window.location.reload();
+        }
+        else {
+            alert(j.message);
+        }
+    });
+
+}
 
 function btnAddToCartClick(e) {
     let btn = e.target.closest("[data-to-cart]");

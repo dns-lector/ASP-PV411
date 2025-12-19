@@ -6,6 +6,7 @@
 <div class="text-center">
     <h1 class="display-4">Мій кошик</h1>
 </div>
+id: @Model.Cart?.Id
 
 @if(!Model.IsAuthorized)
 {
@@ -13,7 +14,7 @@
         Для перегляду кошику необхідно увійти до системи
     </div>
 }
-else if(Model.ActiveCart == null)
+else if(Model.Cart == null)
 {
     <div class="alert alert-warning text-center" role="alert">
         Ваш кошик поки що порожній
@@ -22,7 +23,7 @@ else if(Model.ActiveCart == null)
 }
 else
 {
-    foreach(var ci in Model.ActiveCart.CartItems)
+    foreach(var ci in Model.Cart.CartItems)
     {
         <div class="border m-4 p-3 shadow row">
             <div class="col col-2">
@@ -60,12 +61,25 @@ else
             </div>
         </div>
     }
+
+    if(Model.Cart.CloseAt == null)
+    {
+		<button class="btn btn-success" data-buy-cart="@Model.Cart.Id">Придбати</button>
+		<button class="btn btn-danger" data-drop-cart="@Model.Cart.Id">Відкласти</button>
+    }
+    else if (Model.Cart.CloseStatus == 1)
+    {
+        <button class="btn btn-primary" data-repeat-cart="@Model.Cart.Id">Повторити</button>
+    }
+    else
+    {
+        <button class="btn btn-primary" data-restore-cart="@Model.Cart.Id">Відновити</button>
+    }
+
+    
     @*
-        Д.З. Реалізувати "підсумковий рядок" кошика користувача
-        з інформацією про загальну вартість замовлення (усього кошика)
-        а також про загальну кількість товарів та позицій.
-        Розмістити кнопки "Придбати" та "Відкласти"
-        https://www.datocms-assets.com/48401/1632332129-cart-default-1.png?w=1400
-        https://www.optimonk.com/wp-content/uploads/shopping-cart-page-05.png
+        Д.З. Реалізувати приховування кнопок управління кількістю, а також
+        видалення позиції кошику на сторінках перегляду "закритих" кошиків - 
+        як придбаних, так і скасованих.
     *@
 }

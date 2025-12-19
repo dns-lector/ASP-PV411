@@ -3,6 +3,6 @@
     public class CartIndexViewModel
     {
         public bool IsAuthorized { get; set; }
-        public Data.Entities.Cart? ActiveCart { get; set; }
+        public Data.Entities.Cart? Cart { get; set; }
     }
 }

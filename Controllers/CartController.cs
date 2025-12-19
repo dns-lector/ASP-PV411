@@ -9,7 +9,7 @@ namespace ASP_PV411.Controllers
 {
     public class CartController(DataContext dataContext) : Controller
     {
-        public IActionResult Index()
+        public IActionResult Index([FromRoute] String? id)
         {
             String? userId = User.Claims
                 .FirstOrDefault(c => c.Type == ClaimTypes.Sid)
@@ -18,28 +18,57 @@ namespace ASP_PV411.Controllers
             CartIndexViewModel viewModel = new()
             {
                 IsAuthorized = userId != null,
-                ActiveCart = userId == null ? null :
+                Cart = userId == null ? null :
                     dataContext
                     .Carts
                     .Include(c => c.CartItems)
                         .ThenInclude(ci => ci.Product)
-                    .FirstOrDefault(c => c.UserId.ToString() == userId && c.CloseAt == null)
+                    .FirstOrDefault(c => c.UserId.ToString() == userId && (id == null ? c.CloseAt == null : c.Id.ToString() == id))
             };
 
             return View(viewModel);
         }
 
+        public JsonResult Buy([FromRoute] String id)
+        {
+            try
+            {
+                Cart cart = GetCartById(id);
+                cart.CloseAt = DateTime.Now;
+                cart.CloseStatus = 1;
+                dataContext.SaveChanges();
+                return Json(new { Status = "Ok", Message = "Complete" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = "Error", Message = ex.Message });
+            }
+        }
+
+        public JsonResult Drop([FromRoute] String id)
+        {
+            try
+            {
+                Cart cart = GetCartById(id);
+                cart.CloseAt = DateTime.Now;
+                cart.CloseStatus = -1;
+                dataContext.SaveChanges();
+                return Json(new { Status = "Ok", Message = "Complete" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = "Error", Message = ex.Message });
+            }
+        }
+
         public JsonResult Add([FromRoute] String id)
         {
             // Перевіряємо авторизацію, вилучаємо ід користувача
-            bool isAuthenticated = HttpContext.User.Identity?.IsAuthenticated ?? false;
-            if (!isAuthenticated)
+            Guid? userId = GetAuthUserId();
+            if (userId == null)
             {
                 return Json(new { Status = "Error", Message = "UnAuthorized" });
             }
-            Guid userId = Guid.Parse(
-                HttpContext.User.Claims.First(c => c.Type == ClaimTypes.Sid).Value
-            );
 
             // Перевіряємо валідність товару (ід)
             var product = dataContext.Products.FirstOrDefault(p => p.Id.ToString() == id);
@@ -63,7 +92,7 @@ namespace ASP_PV411.Controllers
                 cart = new Cart
                 {
                     Id = Guid.NewGuid(),
-                    UserId = userId,
+                    UserId = userId.Value,
                 };
                 dataContext.Carts.Add(cart);
             }
@@ -115,6 +144,49 @@ namespace ASP_PV411.Controllers
             // Повертаємо статус обробки
             return Json(new { Status = "Ok", Message = "Added" });
         }
+
+        private Guid? GetAuthUserId()
+        {
+            // Перевіряємо авторизацію, вилучаємо ід користувача
+            bool isAuthenticated = HttpContext.User.Identity?.IsAuthenticated ?? false;
+            if (!isAuthenticated)
+            {
+                return null;
+            }
+            try
+            {
+                return Guid.Parse(
+                    HttpContext.User.Claims.First(c => c.Type == ClaimTypes.Sid).Value
+                );
+            }
+            catch
+            {
+                return null;
+            }
+            
+        }
+    
+        private Cart GetCartById(String id)
+        {
+            Guid? userId = GetAuthUserId() 
+                ?? throw new Exception( "UnAuthorized" );
+
+            // перевіряємо валідність кошику
+            Cart? cart = dataContext.Carts.FirstOrDefault(c => c.Id.ToString() == id) 
+                ?? throw new Exception("Cart Not Found" );
+
+            // перевіряємо, що кошик активний (не закритий), а також його належність користувачеві
+            if (cart.UserId != userId)
+            {
+                throw new Exception("Forbidden");
+            }
+            if (cart.CloseAt != null)
+            {
+                throw new Exception("Cart Is Closed");
+            }
+            return cart;
+        }
+    
     }
 }
 /* Д.З. Реалізувати роботу кнопки "До кошику", що знаходиться
