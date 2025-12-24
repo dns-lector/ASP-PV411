@@ -54,7 +54,7 @@ builder.Services.AddDbContext<DataContext>(
 
 builder.Services.AddCors(
     options => options.AddDefaultPolicy( 
-        policy => policy.AllowAnyOrigin()
+        policy => policy.AllowAnyOrigin().AllowAnyHeader()
 ));
 
 var app = builder.Build();
