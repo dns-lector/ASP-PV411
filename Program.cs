@@ -11,6 +11,8 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Comment from VS
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
@@ -49,6 +51,11 @@ builder.Services.AddDbContext<DataContext>(
     options => options.UseSqlServer(connectionString));
 
 
+builder.Services.AddCors(
+    options => options.AddDefaultPolicy( 
+        policy => policy.AllowAnyOrigin()
+));
+
 var app = builder.Build();
 
 var migrationTask = app
@@ -68,6 +75,7 @@ if (!app.Environment.IsDevelopment())
 }
 app.UseHttpsRedirection();
 app.UseRouting();
+app.UseCors();
 app.UseAuthorization();
 app.UseSession();
 app.MapStaticAssets();
