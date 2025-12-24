@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 // Comment from GitHub
 var builder = WebApplication.CreateBuilder(args);
 // Comment from VS
+// Comment from GitHub
 // Comment from VS
 
 // Add services to the container.
