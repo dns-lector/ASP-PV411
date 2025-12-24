@@ -8,21 +8,21 @@ using ASP_PV411.Services.Signature;
 using ASP_PV411.Services.Storage;
 using ASP_PV411.Services.Timestamp;
 using Microsoft.EntityFrameworkCore;
-
+// Comment from GitHub
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Реєструємо наші сервіси
-// Зазвичай, реєструються не об'єкти, а класи (типи), об'єкти створюються
-// автоматично при першому запиті на інжекцію (ледаче створення)
+// ГђГҐВєГ±ГІГ°ГіВєГ¬Г® Г­Г ГёВі Г±ГҐГ°ГўВіГ±ГЁ
+// Г‡Г Г§ГўГЁГ·Г Г©, Г°ГҐВєГ±ГІГ°ГіГѕГІГјГ±Гї Г­ГҐ Г®ГЎ'ВєГЄГІГЁ, Г  ГЄГ«Г Г±ГЁ (ГІГЁГЇГЁ), Г®ГЎ'ВєГЄГІГЁ Г±ГІГўГ®Г°ГѕГѕГІГјГ±Гї
+// Г ГўГІГ®Г¬Г ГІГЁГ·Г­Г® ГЇГ°ГЁ ГЇГҐГ°ГёГ®Г¬Гі Г§Г ГЇГЁГІВі Г­Г  ВіГ­Г¦ГҐГЄГ¶ВіГѕ (Г«ГҐГ¤Г Г·ГҐ Г±ГІГўГ®Г°ГҐГ­Г­Гї)
 
-// різні життєві цикли
+// Г°ВіГ§Г­Ві Г¦ГЁГІГІВєГўВі Г¶ГЁГЄГ«ГЁ
 // builder.Services.AddSingleton<RandomService>();
 // builder.Services.AddTransient<RandomService>();
 // builder.Services.AddScoped<RandomService>();
-// традиція - використання класів-розширень
+// ГІГ°Г Г¤ГЁГ¶ВіГї - ГўГЁГЄГ®Г°ГЁГ±ГІГ Г­Г­Гї ГЄГ«Г Г±ВіГў-Г°Г®Г§ГёГЁГ°ГҐГ­Гј
 builder.Services.AddRandom();
 builder.Services.AddTimestamp();
 builder.Services.AddHash();
@@ -31,7 +31,7 @@ builder.Services.AddKdf();
 builder.Services.AddSignature();
 builder.Services.AddStorage();
 
-// сесії - як інструмент збереження даних між запитами
+// Г±ГҐГ±ВіВї - ГїГЄ ВіГ­Г±ГІГ°ГіГ¬ГҐГ­ГІ Г§ГЎГҐГ°ГҐГ¦ГҐГ­Г­Гї Г¤Г Г­ГЁГµ Г¬ВіГ¦ Г§Г ГЇГЁГІГ Г¬ГЁ
 builder.Services.AddDistributedMemoryCache();
 
 builder.Services.AddSession(options =>
@@ -41,10 +41,10 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// Підключення контексту даних
+// ГЏВіГ¤ГЄГ«ГѕГ·ГҐГ­Г­Гї ГЄГ®Г­ГІГҐГЄГ±ГІГі Г¤Г Г­ГЁГµ
 String connectionString = builder.Configuration.GetConnectionString("LocalDb")
     ?? throw new KeyNotFoundException("Connection String Configuration: key not found 'LocalDb'");
-// Для EF-контекстів є свій метод реєстрації - AddDbContext
+// Г„Г«Гї EF-ГЄГ®Г­ГІГҐГЄГ±ГІВіГў Вє Г±ГўВіГ© Г¬ГҐГІГ®Г¤ Г°ГҐВєГ±ГІГ°Г Г¶ВіВї - AddDbContext
 builder.Services.AddDbContext<DataContext>(
     options => options.UseSqlServer(connectionString));
 
@@ -72,23 +72,23 @@ app.UseAuthorization();
 app.UseSession();
 app.MapStaticAssets();
 
-app.UseAuthSession();   // додатковий Middleware.
+app.UseAuthSession();   // Г¤Г®Г¤Г ГІГЄГ®ГўГЁГ© Middleware.
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
-/* Принцип маршрутизації задається шаблоном у MapControllerRoute:
- * адреса (URL) розділяється на 3 частини по знаку "/"
- * 1. Контролер, якщо не зазначений, то приймається за Home
- * 2. Дія (action), за відсутності - Index
- * 3. Опціонально (?) - id
+/* ГЏГ°ГЁГ­Г¶ГЁГЇ Г¬Г Г°ГёГ°ГіГІГЁГ§Г Г¶ВіВї Г§Г Г¤Г ВєГІГјГ±Гї ГёГ ГЎГ«Г®Г­Г®Г¬ Гі MapControllerRoute:
+ * Г Г¤Г°ГҐГ±Г  (URL) Г°Г®Г§Г¤ВіГ«ГїВєГІГјГ±Гї Г­Г  3 Г·Г Г±ГІГЁГ­ГЁ ГЇГ® Г§Г­Г ГЄГі "/"
+ * 1. ГЉГ®Г­ГІГ°Г®Г«ГҐГ°, ГїГЄГ№Г® Г­ГҐ Г§Г Г§Г­Г Г·ГҐГ­ГЁГ©, ГІГ® ГЇГ°ГЁГ©Г¬Г ВєГІГјГ±Гї Г§Г  Home
+ * 2. Г„ВіГї (action), Г§Г  ГўВіГ¤Г±ГіГІГ­Г®Г±ГІВі - Index
+ * 3. ГЋГЇГ¶ВіГ®Г­Г Г«ГјГ­Г® (?) - id
  * 
- * Робота маршрутизації: 
- * - здійснюється пошук контролера за назвою:
- *    [controller]Controller (за замовчанням HomeController)
- * - у контролері шукається метод з назвою [action] (Index)
- * - передається виконання на нього
+ * ГђГ®ГЎГ®ГІГ  Г¬Г Г°ГёГ°ГіГІГЁГ§Г Г¶ВіВї: 
+ * - Г§Г¤ВіГ©Г±Г­ГѕВєГІГјГ±Гї ГЇГ®ГёГіГЄ ГЄГ®Г­ГІГ°Г®Г«ГҐГ°Г  Г§Г  Г­Г Г§ГўГ®Гѕ:
+ *    [controller]Controller (Г§Г  Г§Г Г¬Г®ГўГ·Г Г­Г­ГїГ¬ HomeController)
+ * - Гі ГЄГ®Г­ГІГ°Г®Г«ГҐГ°Ві ГёГіГЄГ ВєГІГјГ±Гї Г¬ГҐГІГ®Г¤ Г§ Г­Г Г§ГўГ®Гѕ [action] (Index)
+ * - ГЇГҐГ°ГҐГ¤Г ВєГІГјГ±Гї ГўГЁГЄГ®Г­Г Г­Г­Гї Г­Г  Г­ГјГ®ГЈГ®
  */
 
 await migrationTask;
