@@ -34,6 +34,7 @@ builder.Services.AddKdf();
 builder.Services.AddSignature();
 builder.Services.AddStorage();
 
+
 // ñåñ³¿ - ÿê ³íñòðóìåíò çáåðåæåííÿ äàíèõ ì³æ çàïèòàìè
 builder.Services.AddDistributedMemoryCache();
 
@@ -56,6 +57,8 @@ builder.Services.AddCors(
     options => options.AddDefaultPolicy( 
         policy => policy.AllowAnyOrigin().AllowAnyHeader()
 ));
+
+builder.Services.AddScoped<DataAccessor>();
 
 var app = builder.Build();
 
