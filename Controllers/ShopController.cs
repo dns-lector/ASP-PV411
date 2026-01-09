@@ -21,18 +21,25 @@ namespace ASP_PV411.Controllers
         }
         public JsonResult ApiIndex()
         {
-            ShopIndexViewModel model = new()
+            RestResponse restResponse = new()
             {
-                Groups = dataContext
-                .Groups
-                .Where(g => g.DeleteAt == null)
-                .AsEnumerable()
-                .Select(g => g with {
-                    ImageUrl = FullImageUrl(g.ImageUrl)
-                })
-                .ToList(),
+                Meta = new()
+                {
+                    Service = "Крамниця",
+                    ServerTime = DateTime.Now.Ticks,
+                    Cache = 86400,
+                    DataType = "array",
+                    Method = Request.Method,
+                    Path = Request.Path,
+                    Resource = "Price groups",
+                },
+                Data = dataAccessor
+                    .GetSiteGroups()
+                    .Select(g => g with {
+                        ImageUrl = FullImageUrl(g.ImageUrl)
+                    }),
             };
-            return Json(model);
+            return Json(restResponse);
         }
 
 

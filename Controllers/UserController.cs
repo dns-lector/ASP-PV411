@@ -1,6 +1,7 @@
 ﻿using ASP_PV411.Data;
 using ASP_PV411.Data.Entities;
 using ASP_PV411.Middleware;
+using ASP_PV411.Models.Rest;
 using ASP_PV411.Models.User;
 using ASP_PV411.Services.Kdf;
 using ASP_PV411.Services.Salt;
@@ -308,22 +309,33 @@ namespace ASP_PV411.Controllers
 
         public JsonResult ApiAuthenticate()
         {
+            RestResponse restResponse = new()
+            {
+                Meta = new()
+                {
+                    Service = "Користувачі",
+                    ServerTime = DateTime.Now.Ticks,
+                    Cache = 86400,
+                    Method = Request.Method,
+                    Path = Request.Path,
+                    Resource = "Автентифікатор",
+                },
+            };
             try
             {
-                return Json(_Authenticate());
+                restResponse.Data = _Authenticate();
+                restResponse.Meta.DataType = "object";
             }
             catch (Exception ex)
             {
-                Response.StatusCode = StatusCodes.Status401Unauthorized;
-                return Json(ex.Message);
+                restResponse.Meta.DataType = "string";
+                restResponse.Status = RestStatus.UnAuthorized;
+                restResponse.Data = ex.Message;
             }
+            return Json(restResponse);
         }
     }
 }
-/* Д.З. Реалізувати можливість зміни дати народження:
- * - якщо у БД немає відповідних даних, то у таблиці вони не відображаються,
- *    але при переході в режим редагування відповідний рядок має з'являтись
- * - якщо є, то звичайний перехід до редагування.
- * Переконатись у правильній роботі оновлення даних.
+/* Д.З. Прикласти посилання на репозиторії двох проєктів: бек- і фронтенд
  * 
  */

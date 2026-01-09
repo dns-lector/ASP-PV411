@@ -8,6 +8,7 @@
 
         public static readonly RestStatus Ok = new() { IsOk = true, Code = 200, Phrase = "OK" };
         public static readonly RestStatus NotFound = new() { IsOk = false, Code = 404, Phrase = "Not Found" };
+        public static readonly RestStatus UnAuthorized = new() { IsOk = false, Code = 401, Phrase = "UnAuthorized" };
 
     }
 }
